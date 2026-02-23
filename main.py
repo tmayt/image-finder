@@ -33,23 +33,32 @@ def get_first_google_image(query: str):
 
         time.sleep(2)
 
-        # Skip logo images, get real image results
         images = driver.find_elements(By.CSS_SELECTOR, "img")
 
         for img in images:
-            candidate = img.get_attribute("src")
-            if candidate and candidate.startswith("http"):
-                src = candidate
-                break
+            # گرفتن عرض واقعی تصویر
+            width = driver.execute_script(
+                "return arguments[0].naturalWidth;", img
+            )
 
-    except Exception:
+            if width and width > 200:
+                candidate = img.get_attribute("src")
+
+                if not candidate:
+                    candidate = img.get_attribute("data-src")
+
+                if candidate and candidate.startswith("http"):
+                    src = candidate
+                    break
+
+    except Exception as e:
+        print("Error:", e)
         src = None
 
     finally:
         driver.quit()
 
     return src
-
 
 @app.route("/search", methods=["GET"])
 def search_image():
