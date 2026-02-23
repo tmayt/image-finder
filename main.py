@@ -28,7 +28,7 @@ def get_first_google_image(query: str):
     src = None
 
     try:
-        search_url = f"https://www.google.com/search?tbm=isch&q={query}"
+        search_url = f"https://www.bing.com/images/search?q={query}&first=1"
         driver.get(search_url)
 
         time.sleep(2)
