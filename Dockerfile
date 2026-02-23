@@ -1,13 +1,14 @@
 FROM python:3.11-slim
 
 ENV DEBIAN_FRONTEND=noninteractive
+ENV PYTHONUNBUFFERED=1
 
-# Install dependencies
+# Install system dependencies
 RUN apt-get update && apt-get install -y \
     wget \
     gnupg \
-    unzip \
     curl \
+    unzip \
     ca-certificates \
     fonts-liberation \
     libasound2 \
@@ -27,7 +28,7 @@ RUN apt-get update && apt-get install -y \
     libcups2 \
     && rm -rf /var/lib/apt/lists/*
 
-# Install latest Google Chrome
+# Install Google Chrome (latest stable)
 RUN mkdir -p /etc/apt/keyrings && \
     curl -fsSL https://dl.google.com/linux/linux_signing_key.pub | gpg --dearmor -o /etc/apt/keyrings/google.gpg && \
     echo "deb [arch=amd64 signed-by=/etc/apt/keyrings/google.gpg] http://dl.google.com/linux/chrome/deb/ stable main" \
@@ -36,17 +37,15 @@ RUN mkdir -p /etc/apt/keyrings && \
     apt-get install -y google-chrome-stable && \
     rm -rf /var/lib/apt/lists/*
 
-# Use known compatible ChromeDriver v114
-ENV CHROMEDRIVER_VERSION=114.0.5735.90
-RUN wget -O /tmp/chromedriver.zip \
-       "https://chromedriver.storage.googleapis.com/$CHROMEDRIVER_VERSION/chromedriver_linux64.zip" && \
-    unzip /tmp/chromedriver.zip -d /usr/local/bin/ && \
-    rm /tmp/chromedriver.zip && \
-    chmod +x /usr/local/bin/chromedriver
+# ❌ DO NOT INSTALL CHROMEDRIVER MANUALLY
+# Selenium Manager will handle it automatically
 
-# App setup
 WORKDIR /app
+
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir -r requirements.txt
+
 COPY . .
+
 CMD ["python", "main.py"]
