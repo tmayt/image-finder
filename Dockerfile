@@ -2,7 +2,7 @@ FROM python:3.11-slim
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Install dependencies for Chrome + ChromeDriver
+# Install dependencies
 RUN apt-get update && apt-get install -y \
     wget \
     gnupg \
@@ -36,23 +36,17 @@ RUN mkdir -p /etc/apt/keyrings && \
     apt-get install -y google-chrome-stable && \
     rm -rf /var/lib/apt/lists/*
 
-# Install a known working ChromeDriver version
-# Known version compatible with Chrome ~115
-ENV CHROMEDRIVER_VERSION=115.0.5790.170
-RUN wget -O /tmp/chromedriver.zip "https://chromedriver.storage.googleapis.com/$CHROMEDRIVER_VERSION/chromedriver_linux64.zip" && \
+# Use known compatible ChromeDriver v114
+ENV CHROMEDRIVER_VERSION=114.0.5735.90
+RUN wget -O /tmp/chromedriver.zip \
+       "https://chromedriver.storage.googleapis.com/$CHROMEDRIVER_VERSION/chromedriver_linux64.zip" && \
     unzip /tmp/chromedriver.zip -d /usr/local/bin/ && \
     rm /tmp/chromedriver.zip && \
     chmod +x /usr/local/bin/chromedriver
 
-# Set working directory
+# App setup
 WORKDIR /app
-
-# Copy and install Python dependencies
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
-
-# Copy application code
 COPY . .
-
-# Run app
 CMD ["python", "main.py"]
