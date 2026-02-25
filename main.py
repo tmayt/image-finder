@@ -75,14 +75,13 @@ def get_casio_item(driver, query):
         driver.get(link)
         time.sleep(4)
 
-        images = driver.find_elements(By.CSS_SELECTOR, "ul.p-product_detail-carousel__inner img")
-        print(images)
-        for image in images:
-            src = image.get_attribute("src")
-            if src and src.startswith("http"):
-                return link, src
-            else:
-                return link, 'https://www.casio.com' + src
+        image = driver.find_element(By.CSS_SELECTOR, "ul.p-product_detail-carousel__inner img")
+
+        src = image.get_attribute("src")
+        if src and src.startswith("http"):
+            return link, src
+        else:
+            return link, 'https://www.casio.com' + src
 
         return link, None
 
